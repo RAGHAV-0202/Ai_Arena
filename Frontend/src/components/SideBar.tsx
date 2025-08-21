@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { gsap } from "gsap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { baseUrl } from "../baseUrl.js"; // Adjust path as needed
+import { baseUrl } from "../baseUrl.js";
 
 interface Chat {
   _id: string;
@@ -24,6 +24,7 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
 
   const toggle = useCallback(() => setCollapsed((p) => !p), []);
 
+  // Sidebar animation
   useEffect(() => {
     if (!sidebarRef.current) return;
 
@@ -31,23 +32,22 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
 
     if (mq.matches) {
       gsap.to(sidebarRef.current, {
-        width: collapsed ? 72 : 272,
-        x: 0,
+        width: collapsed ? 72 : 280,
         duration: 0.4,
-        ease: "power2.out",
+        ease: "power3.out",
+        backdropFilter: "blur(12px)",
       });
     } else {
-      // Mobile: animate slide in/out
       gsap.to(sidebarRef.current, {
-        x: collapsed ? -272 : 0,
-        width: 272,
-        duration: 0.4,
-        ease: "power2.out",
+        x: collapsed ? -300 : 0,
+        width: 280,
+        duration: 0.5,
+        ease: "power3.out",
       });
     }
   }, [collapsed]);
 
-  // Fetch all chats on component mount
+  // Fetch chats
   useEffect(() => {
     fetchChats();
   }, []);
@@ -56,48 +56,29 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
     try {
       setLoading(true);
       const response = await axios.get(`${baseUrl}/chats`, { withCredentials: true });
-      if (response.data?.data) {
-        setChats(response.data.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch chats:", error);
-      // Could add toast notification here
+      setChats(response.data?.data || []);
+    } catch (err) {
+      console.error("Failed to fetch chats:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleNewChat = async () => {
-    if (creatingNewChat) return; // Prevent multiple clicks
-    
+    if (creatingNewChat) return;
     setCreatingNewChat(true);
-    
+
     try {
-      // Create new chat via API
-      const response = await axios.post(
-        `${baseUrl}/chats/new`, 
-        { title: "New Chat" }, 
-        { withCredentials: true }
-      );
-      
-      if (response.data?.data) {
-        const newChat = response.data.data;
-        
-        // Add the new chat to the top of the list
+      const response = await axios.post(`${baseUrl}/chats/new`, { title: "New Chat" }, { withCredentials: true });
+      const newChat = response.data?.data;
+      if (newChat) {
         setChats(prev => [newChat, ...prev]);
-        
-        // Navigate to the new chat
         navigate(`/chat/${newChat.chatId}`);
-        
-        // Close sidebar on mobile after creating chat
-        if (window.innerWidth < 768) {
-          setCollapsed(true);
-        }
+        if (window.innerWidth < 768) setCollapsed(true);
       }
-    } catch (error) {
-      console.error("Failed to create new chat:", error);
-      // Fallback: navigate to /chat and let the Chat component handle creation
-      navigate('/chat');
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+      navigate("/chat");
     } finally {
       setCreatingNewChat(false);
     }
@@ -105,142 +86,105 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
 
   const handleChatClick = (chatId: string) => {
     navigate(`/chat/${chatId}`);
-    
-    // Close sidebar on mobile after selecting chat
-    if (window.innerWidth < 768) {
-      setCollapsed(true);
-    }
+    if (window.innerWidth < 768) setCollapsed(true);
   };
 
   const deleteChat = async (chatId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent chat navigation when deleting
-    
-    // Optimistic update - remove from UI immediately
+    e.stopPropagation();
     const previousChats = [...chats];
-    setChats(prev => prev.filter(chat => chat.chatId !== chatId));
-    
+    setChats(prev => prev.filter(c => c.chatId !== chatId));
+
     try {
       await axios.delete(`${baseUrl}/chats/${chatId}`, { withCredentials: true });
-      
-      // If we're currently viewing this chat, navigate away
       if (currentChatId === chatId) {
-        const remainingChats = chats.filter(chat => chat.chatId !== chatId);
-        if (remainingChats.length > 0) {
-          navigate(`/chat/${remainingChats[0].chatId}`);
-        } else {
-          // No chats left, create a new one or go home
-          handleNewChat();
-        }
+        const remaining = chats.filter(c => c.chatId !== chatId);
+        remaining.length ? navigate(`/chat/${remaining[0].chatId}`) : handleNewChat();
       }
-    } catch (error) {
-      console.error("Failed to delete chat:", error);
-      // Rollback optimistic update on error
+    } catch (err) {
+      console.error(err);
       setChats(previousChats);
-      // Could add toast notification here
     }
   };
 
-  // Generate chat title from first user message or use default
   const getChatTitle = (chat: Chat) => {
-    if (chat.title && chat.title !== "New Chat") {
-      return chat.title;
-    }
-    
-    // Try to find first user message
+    if (chat.title && chat.title !== "New Chat") return chat.title;
+
     for (const provider of chat.providers || []) {
-      if (provider.messages && provider.messages.length > 0) {
-        const firstUserMessage = provider.messages.find((msg: any) => 
-          msg.provider?.includes('149071.png') // User avatar
-        );
-        if (firstUserMessage) {
-          return firstUserMessage.text.length > 30 
-            ? `${firstUserMessage.text.substring(0, 30)}...`
-            : firstUserMessage.text;
-        }
-      }
+      const firstUser = provider.messages?.find((m: any) => m.provider?.includes("149071.png"));
+      if (firstUser) return firstUser.text.length > 30 ? `${firstUser.text.slice(0, 30)}...` : firstUser.text;
     }
-    
     return "New Chat";
   };
 
   return (
     <>
-      {/* Floating toggle button (always visible on mobile, inside sidebar on desktop) */}
+      {/* Floating toggle button */}
       <button
         onClick={toggle}
-        aria-expanded={!collapsed}
-        aria-label="Toggle Sidebar"
-        className="md:hidden fixed top-3 left-3 z-50 p-2 rounded-full bg-[#282A2C] text-white hover:bg-[#3a3d3f] transition-colors"
+        className="md:hidden fixed top-1/2 left-3 z-50 p-3 rounded-full bg-[#1F2123] text-white shadow-lg hover:bg-[#2A2D30] transition-colors -translate-y-1/2"
       >
         <i className="fa-solid fa-bars" />
       </button>
 
-      {/* Sidebar container */}
+      {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className="sidebar fixed md:relative top-0 left-0 h-screen bg-[#282A2C] p-3 flex flex-col justify-start overflow-hidden z-40"
-        style={{ width: 72 }} // default for desktop, overridden by GSAP
+        className="sidebar fixed md:relative top-0 left-0 h-screen bg-[#1F2123]/70 backdrop-blur-md shadow-xl p-3 flex flex-col overflow-hidden z-40 rounded-r-2xl"
+        style={{ width: 72 }}
       >
-        {/* Top toggle for desktop */}
+        {/* Desktop toggle */}
         <div className="hidden md:flex w-full h-[50px] items-center justify-center">
-          <button
-            onClick={toggle}
-            aria-expanded={!collapsed}
-            aria-label="Toggle Sidebar"
-            className="text-white hover:text-gray-300 transition-colors"
-          >
+          <button onClick={toggle} className="text-white hover:text-gray-300 transition">
             <i className="fa-solid fa-bars" />
           </button>
         </div>
 
-        {/* Sidebar content */}
+        {/* New Chat Button */}
         {!collapsed && (
-          <button 
+          <button
             onClick={handleNewChat}
             disabled={creatingNewChat}
-            className={`mt-3 sidebarchat text-nowrap text-white w-full my-1 rounded-2xl py-2 flex items-center px-2 hover:bg-[#3a3d3f] transition text-[15px] ${
-              creatingNewChat ? 'opacity-50 cursor-not-allowed' : ''
-            }`} 
-          > 
-            <i className={`fa-solid ${creatingNewChat ? 'fa-spinner fa-spin' : 'fa-plus'} pr-4 flex items-center justify-center pt-[2px]`}></i> 
-            {creatingNewChat ? 'Creating...' : 'New Chat'}
+            className={`mt-3 w-full flex items-center px-3 py-2 rounded-2xl text-white hover:bg-[#2A2D30] transition-all ${
+              creatingNewChat ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <i className={`fa-solid ${creatingNewChat ? "fa-spinner fa-spin" : "fa-plus"} mr-3`}></i>
+            {creatingNewChat ? "Creating..." : "New Chat"}
           </button>
         )}
-        
+
+        {/* Chat List */}
         {!collapsed && (
-          <div className="sidebarBottom w-full h-full mt-3 pl-3 overflow-y-auto">
-            <div className="sticky top-0 bg-[#282A2C] pb-1">
-              <h4 className="text-[#9A9B9C]">Recent</h4>
+          <div className="sidebarBottom flex-1 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <div className="sticky top-0 bg-[#1F2123]/70 backdrop-blur-md py-2 px-2 rounded-b-xl shadow-sm mb-2">
+              <h4 className="text-gray-400 uppercase text-xs tracking-wide">Recent</h4>
             </div>
 
             {loading ? (
-              <div className="text-[#9B9B9C] text-sm py-2 flex items-center">
-                <i className="fa-solid fa-spinner fa-spin mr-2"></i>
-                Loading chats...
+              <div className="text-gray-400 text-sm py-2 flex items-center">
+                <i className="fa-solid fa-spinner fa-spin mr-2"></i> Loading chats...
               </div>
             ) : chats.length === 0 ? (
-              <div className="text-[#9B9B9C] text-sm py-2 text-center">
+              <div className="text-gray-500 text-sm py-4 text-center opacity-80">
                 <p>No chats yet</p>
-                <p className="text-xs mt-1 opacity-75">Click "New Chat" to start</p>
+                <p className="text-xs mt-1">Click "New Chat" to start</p>
               </div>
             ) : (
-              chats.map((chat) => (
+              chats.map(chat => (
                 <div
                   key={chat.chatId}
-                  className={`group sidebarchat text-nowrap w-full my-1 rounded-2xl py-2 flex items-center px-2 hover:bg-[#3a3d3f] transition text-[15px] cursor-pointer ${
-                    currentChatId === chat.chatId ? 'bg-[#3a3d3f]' : ''
+                  className={`group flex items-center justify-between p-2 mb-2 rounded-xl cursor-pointer transition-all hover:bg-[#2A2D30] ${
+                    currentChatId === chat.chatId ? "bg-[#2A2D30]" : ""
                   }`}
                   onClick={() => handleChatClick(chat.chatId)}
                 >
                   <div className="flex items-center flex-1 min-w-0">
-                    <i className="fa-regular fa-message text-[#9B9B9C] text-xs mr-2 flex-shrink-0"></i>
-                    <p className="truncate text-[#9B9B9C] flex-1">
-                      {getChatTitle(chat)}
-                    </p>
+                    <i className="fa-regular fa-message text-gray-400 text-sm mr-2 flex-shrink-0" />
+                    <p className="truncate text-gray-300">{getChatTitle(chat)}</p>
                   </div>
                   <button
                     onClick={(e) => deleteChat(chat.chatId, e)}
-                    className="opacity-0 group-hover:opacity-100 ml-2 text-[#9B9B9C] hover:text-red-400 transition-all p-1 rounded"
+                    className="opacity-0 group-hover:opacity-100 ml-2 text-gray-400 hover:text-red-500 p-1 rounded transition-all"
                     title="Delete chat"
                   >
                     <i className="fa-solid fa-trash text-xs"></i>
@@ -252,12 +196,11 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
         )}
       </div>
 
-      {/* Backdrop on mobile when sidebar open */}
+      {/* Mobile backdrop */}
       {!collapsed && (
         <div
-          className="md:hidden fixed inset-0 z-30 bg-black/50"
+          className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
           onClick={() => setCollapsed(true)}
-          aria-hidden="true"
         />
       )}
     </>

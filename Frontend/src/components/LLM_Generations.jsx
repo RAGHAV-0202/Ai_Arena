@@ -27,11 +27,25 @@ function formatMessagesForProvider(messages, provider) {
   }
 }
 
+const models = [
+  "gemini-2.5-flash",
+  // "gemini-2.5-pro",
+  "gemini-2.0-flash",
+  // "gemini-1.5-flash",
+  // "gemini-1.5-pro"
+];
+
+function getRandomModel() {
+  const index = Math.floor(Math.random() * models.length);
+  return models[index];
+}
+
 async function GenerateGemini(prompt, conversationHistory = []) {
   console.log("initiating Gemini");
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: getRandomModel()  });
+    console.log(model.model)
     
     if (conversationHistory.length === 0) {
       // Simple generation without history
