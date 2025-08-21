@@ -75,9 +75,12 @@ Ai_Arena is a **multi-modal AI chat platform** that allows users to interact wit
     |   .gitignore
     |   eslint.config.js
     |   index.html
+    |   netlify.toml
     |   package-lock.json
     |   package.json
     |   README.md
+    |   serve.json
+    |   vercel.json
     |   vite.config.js
     |   
     +---public
@@ -90,23 +93,52 @@ Ai_Arena is a **multi-modal AI chat platform** that allows users to interact wit
         |   index.css
         |   main.jsx
         |   react-router-setup.jsx
+        |   tailwind.config.js
         |   
         +---assets
+        |       img1.avif
+        |       img2.avif
+        |       img3.avif
+        |       img4.avif
+        |       img5.avif
         |       react.svg
         |       
         +---components
         |       GPT_Area.jsx
         |       HandlePrompt.js
+        |       HomePageFeatures.jsx
+        |       HomePageHero.jsx
+        |       HomePageNavbar.jsx
         |       LLM_Generations.jsx
         |       PromptPanel.jsx
         |       SideBar.tsx
         |       
-        \---pages
-                Chat.jsx
-                HomePage.jsx
-                Login.jsx
-                RedirectNewChat.jsx
-                Register.jsx
+        +---pages
+        |       Chat.jsx
+        |       HomePage.jsx
+        |       Login.jsx
+        |       RedirectNewChat.jsx
+        |       Register.jsx
+        |       
+        \---UI
+            |   .gitkeep
+            |   
+            \---Components
+                    AIButton.tsx
+                    Aurora.jsx
+                    Border.jsx
+                    Dock.jsx
+                    DotGrid.jsx
+                    FlowingMenu.jsx
+                    GooeyNav.jsx
+                    OrbBg.jsx
+                    Particles.jsx
+                    RotatingText.jsx
+                    Silk.jsx
+                    Speed.jsx
+                    SquareBG.jsx
+                    TrueFocus.jsx
+                    
 ```
 
 ## Installation & Setup ⚡
