@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullpage/react-fullpage": "^0.1.49",
     "@google/genai": "^1.15.0",
     "@google/generative-ai": "^0.24.1",
+    "@react-three/drei": "^10.7.3",
+    "@react-three/fiber": "^9.3.0",
     "@tailwindcss/vite": "^4.1.12",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
@@ -28,6 +31,7 @@
     "marked-gfm-heading-id": "^4.1.2",
     "motion": "^12.23.12",
     "ogl": "^1.0.11",
+    "postprocessing": "^6.37.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
@@ -38,6 +42,7 @@
     "simplebar": "^6.3.2",
     "simplebar-react": "^3.3.2",
     "tailwindcss": "^4.1.12",
+    "three": "^0.179.1",
     "tsparticles": "^3.9.1"
   },
   "devDependencies": {
