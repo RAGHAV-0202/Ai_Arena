@@ -1,96 +1,96 @@
 Folder PATH listing
 Volume serial number is 3049-A0A1
 C:.
-¦   .gitignore
-¦   project_structure.txt
-¦   README.md
-¦   
+|   .gitignore
+|   project_structure.txt
+|   README.md
+|   
 +---Backend
-¦   ¦   .env
-¦   ¦   .gitignore
-¦   ¦   package-lock.json
-¦   ¦   package.json
-¦   ¦   
-¦   +---src
-¦       ¦   app.js
-¦       ¦   index.js
-¦       ¦   
-¦       +---controllers
-¦       ¦       auth.controllers.js
-¦       ¦       chats.controllers.js
-¦       ¦       
-¦       +---db
-¦       ¦       connectDB.js
-¦       ¦       
-¦       +---middlewares
-¦       ¦       auth.middleware.js
-¦       ¦       
-¦       +---models
-¦       ¦       users.models.js
-¦       ¦       
-¦       +---routes
-¦       ¦       auth.routes.js
-¦       ¦       chat.routes.js
-¦       ¦       
-¦       +---utils
-¦               apiError.js
-¦               apiResponse.js
-¦               asyncHandler.js
-¦               
-+---Frontend
-    ¦   .env
-    ¦   .gitignore
-    ¦   eslint.config.js
-    ¦   index.html
-    ¦   netlify.toml
-    ¦   package-lock.json
-    ¦   package.json
-    ¦   README.md
-    ¦   serve.json
-    ¦   vercel.json
-    ¦   vite.config.js
-    ¦   
+|   |   .env
+|   |   .gitignore
+|   |   package-lock.json
+|   |   package.json
+|   |   
+|   \---src
+|       |   app.js
+|       |   index.js
+|       |   
+|       +---controllers
+|       |       auth.controllers.js
+|       |       chats.controllers.js
+|       |       
+|       +---db
+|       |       connectDB.js
+|       |       
+|       +---middlewares
+|       |       auth.middleware.js
+|       |       
+|       +---models
+|       |       users.models.js
+|       |       
+|       +---routes
+|       |       auth.routes.js
+|       |       chat.routes.js
+|       |       
+|       \---utils
+|               apiError.js
+|               apiResponse.js
+|               asyncHandler.js
+|               
+\---Frontend
+    |   .env
+    |   .gitignore
+    |   eslint.config.js
+    |   index.html
+    |   netlify.toml
+    |   package-lock.json
+    |   package.json
+    |   README.md
+    |   serve.json
+    |   vercel.json
+    |   vite.config.js
+    |   
     +---public
-    ¦       vite.svg
-    ¦       
-    +---src
-        ¦   App.css
-        ¦   App.jsx
-        ¦   baseUrl.js
-        ¦   index.css
-        ¦   main.jsx
-        ¦   react-router-setup.jsx
-        ¦   tailwind.config.js
-        ¦   
+    |       vite.svg
+    |       
+    \---src
+        |   App.css
+        |   App.jsx
+        |   baseUrl.js
+        |   index.css
+        |   main.jsx
+        |   react-router-setup.jsx
+        |   tailwind.config.js
+        |   
         +---assets
-        ¦       img1.avif
-        ¦       img2.avif
-        ¦       img3.avif
-        ¦       img4.avif
-        ¦       img5.avif
-        ¦       react.svg
-        ¦       
+        |       img1.avif
+        |       img2.avif
+        |       img3.avif
+        |       img4.avif
+        |       img5.avif
+        |       react.svg
+        |       
         +---components
-        ¦       GPT_Area.jsx
-        ¦       HandlePrompt.js
-        ¦       HomePageFeatures.jsx
-        ¦       HomePageHero.jsx
-        ¦       HomePageNavbar.jsx
-        ¦       LLM_Generations.jsx
-        ¦       PromptPanel.jsx
-        ¦       SideBar.tsx
-        ¦       
+        |       GPT_Area.jsx
+        |       HandlePrompt.js
+        |       HomePageFeatures.jsx
+        |       HomePageHero.jsx
+        |       HomePageNavbar.jsx
+        |       LLM_Generations.jsx
+        |       PromptPanel.jsx
+        |       SideBar.tsx
+        |       
         +---pages
-        ¦       Chat.jsx
-        ¦       HomePage.jsx
-        ¦       Login.jsx
-        ¦       RedirectNewChat.jsx
-        ¦       Register.jsx
-        ¦       
-        +---UI
-            ¦   .gitkeep
-            ¦   
-            +---Components
+        |       Chat.jsx
+        |       HomePage.jsx
+        |       Login.jsx
+        |       RedirectNewChat.jsx
+        |       Register.jsx
+        |       
+        \---UI
+            |   .gitkeep
+            |   
+            \---Components
                     AIButton.tsx
                     Aurora.jsx
                     Border.jsx
