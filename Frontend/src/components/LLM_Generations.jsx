@@ -1,11 +1,9 @@
 import axios from "axios"
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY , dangerouslyAllowBrowser : true});
-const ai = new GoogleGenAI({
-  apiKey : import.meta.env.VITE_GEMINI_API_KEY
-});
+const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 // Helper function to convert messages to the format expected by each provider
 function formatMessagesForProvider(messages, provider) {
@@ -33,29 +31,28 @@ async function GenerateGemini(prompt, conversationHistory = []) {
   console.log("initiating Gemini");
   
   try {
-    // Build conversation history for Gemini
-    const messages = [
-      ...conversationHistory.map(msg => ({
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    if (conversationHistory.length === 0) {
+      // Simple generation without history
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } else {
+      // Chat with history
+      const history = conversationHistory.map(msg => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
-        content: msg.content
-      })),
-      { role: 'user', content: prompt }
-    ];
+        parts: [{ text: msg.content }]
+      }));
 
-    // Format for Gemini's expected structure
-    const contents = messages.map(msg => ({
-      role: msg.role,
-      parts: [{ text: msg.content }]
-    }));
+      const chat = model.startChat({
+        history: history
+      });
 
-    const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const chat = model.startChat({
-      history: contents.slice(0, -1), // All messages except the last one
-    });
-
-    const result = await chat.sendMessage(prompt);
-    const response = await result.response;
-    return response.text();
+      const result = await chat.sendMessage(prompt);
+      const response = await result.response;
+      return response.text();
+    }
     
   } catch (error) {
     console.error("Gemini generation error:", error);
@@ -78,7 +75,7 @@ async function GenerateChatGPT(prompt, conversationHistory = []) {
 
     const completion = await groq.chat.completions.create({
       messages: messages,
-      model: "openai/gpt-oss-20b",
+      model: "openai/gpt-oss-20b", // Current production model
       max_tokens: 1024,
       temperature: 0.7,
     });
@@ -123,4 +120,4 @@ async function GenerateLlama8b(prompt, conversationHistory = []) {
   }
 }
 
-export {GenerateChatGPT , GenerateLlama8b , GenerateGemini}
+export { GenerateChatGPT, GenerateLlama8b, GenerateGemini }
