@@ -13,7 +13,7 @@ const app = express()
 app.use(express.json({limit : "100kb"}))
 app.use(cookieParser())
 const corsOptions = {
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173' , "https://ai-arena-ten.vercel.app" , "https://www.aiarenas.app"],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     credentials: true ,
