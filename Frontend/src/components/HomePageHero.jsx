@@ -39,7 +39,7 @@ const Hero = () => {
           </p>
 
           
-          <div className="mt-8">
+          <div className="mt-8 flex flex-row gap-5">
             <a href="/register" className="inline-block">
               <StarBorder
                 as="button"
@@ -47,7 +47,19 @@ const Hero = () => {
                 color="cyan"
                 speed="5s"
               >
-                Get Started Now
+                Get Started Now 
+                <i className="fa-solid fa-arrow-right text-white pl-2"></i>
+              </StarBorder>
+            </a>
+
+            <a href="/chat" className="inline-block">
+              <StarBorder
+                as="button"
+                className="custom-class p-3 sm:p-4 transition-transform duration-300 hover:scale-110 text-sm sm:text-base"
+                color="cyan"
+                speed="5s"
+              >
+                Chat
                 <i className="fa-solid fa-arrow-right text-white pl-2"></i>
               </StarBorder>
             </a>

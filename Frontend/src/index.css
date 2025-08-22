@@ -8,6 +8,10 @@ body{
 .test{
     font-family: "Playfair Display", serif;
 }
+:root {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
 
 /* Applies to vertical scrollbar */
 ::-webkit-scrollbar {

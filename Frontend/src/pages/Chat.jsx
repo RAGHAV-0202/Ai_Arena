@@ -259,7 +259,7 @@ function Chat() {
   }
 
   return (
-    <div className="chatPage bg-[#1B1C1D] h-screen w-screen flex overflow-hidden">
+    <div className="chatPage bg-[#1B1C1D] h-screen w-screen flex overflow-hidden pt-[env(safe-area-inset-top)]">
       <div className="sidebar-container">
         <SideBar currentChatId={chatId} />
       </div>

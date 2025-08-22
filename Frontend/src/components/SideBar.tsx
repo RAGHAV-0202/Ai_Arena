@@ -19,10 +19,27 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(false);
   const [creatingNewChat, setCreatingNewChat] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // 👈 logi
 
   const navigate = useNavigate();
 
   const toggle = useCallback(() => setCollapsed((p) => !p), []);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const res = await axios.get(`${baseUrl}/isLoggedIn`, { withCredentials: true });
+        setIsLoggedIn(res.data?.success || false); // adjust based on your backend response
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkLogin();
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) fetchChats();
+  }, [isLoggedIn]);
 
   // Sidebar animation
   useEffect(() => {
@@ -155,21 +172,35 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
 
         {/* Chat List */}
         {!collapsed && (
-          <div className="sidebarBottom flex-1 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+          <div className="flex-1 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
             <div className="sticky top-0 bg-[#1F2123]/70 backdrop-blur-md py-2 px-2 rounded-b-xl shadow-sm mb-2">
               <h4 className="text-gray-400 uppercase text-xs tracking-wide">Recent</h4>
             </div>
 
-            {loading ? (
+            {isLoggedIn === null ? (
+              // Still checking login
+              <div className="text-gray-400 text-sm py-2 flex items-center">
+                <i className="fa-solid fa-spinner fa-spin mr-2"></i> Checking login...
+              </div>
+            ) : !isLoggedIn ? (
+              // Not logged in
+              <div className="text-gray-500 text-sm py-4 text-center opacity-80">
+                <p>You are not logged in</p>
+                <p className="text-xs mt-1">Chat history won’t be saved</p>
+              </div>
+            ) : loading ? (
+              // Logged in but chats still loading
               <div className="text-gray-400 text-sm py-2 flex items-center">
                 <i className="fa-solid fa-spinner fa-spin mr-2"></i> Loading chats...
               </div>
             ) : chats.length === 0 ? (
+              // Logged in but no chats yet
               <div className="text-gray-500 text-sm py-4 text-center opacity-80">
                 <p>No chats yet</p>
                 <p className="text-xs mt-1">Click "New Chat" to start</p>
               </div>
             ) : (
+              // Show chats
               chats.map(chat => (
                 <div
                   key={chat.chatId}
@@ -194,7 +225,38 @@ function SideBar({ currentChatId }: { currentChatId?: string }) {
             )}
           </div>
         )}
+
+
+        {/* Bottom Section (Logout OR Message) */}
+        {!collapsed && (
+          <div className="mt-auto pt-3 border-t border-gray-700">
+            {isLoggedIn ? (
+              <button
+                onClick={async () => {
+                  try {
+                    await axios.post(`${baseUrl}/auth/logout`, {}, { withCredentials: true });
+                    setIsLoggedIn(false);
+                    navigate("/login");
+                  } catch (err) {
+                    console.error("Logout failed:", err);
+                  }
+                }}
+                className="w-full py-2 bg-red-600 hover:bg-red-700 rounded-xl text-white font-medium"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full py-2 bg-green-600 hover:bg-green-700 rounded-xl text-white font-medium"
+              >
+                Login
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
 
       {/* Mobile backdrop */}
       {!collapsed && (
