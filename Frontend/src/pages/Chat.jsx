@@ -38,7 +38,7 @@ function Chat() {
     },
     { 
       id: 2, 
-      title: "Llama 3.1 8b", 
+      title: "Llama 3.3 70b ", 
       logo: "https://cdn.pixabay.com/photo/2021/11/01/15/20/meta-logo-6760788_1280.png", 
       messages: [] 
     }
