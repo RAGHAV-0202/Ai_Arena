@@ -89,7 +89,7 @@ async function GenerateChatGPT(prompt, conversationHistory = []) {
 
     const completion = await groq.chat.completions.create({
       messages: messages,
-      model: "openai/gpt-oss-20b", // Current production model
+      model: "openai/gpt-oss-120b", // Current production model
       max_tokens: 1024,
       temperature: 0.7,
     });
@@ -119,7 +119,7 @@ async function GenerateLlama8b(prompt, conversationHistory = []) {
 
     const completion = await groq.chat.completions.create({
       messages: messages,
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       max_tokens: 1024,
       temperature: 0.7,
     });
